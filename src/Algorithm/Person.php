@@ -6,7 +6,7 @@ namespace CodelyTV\FinderKata\Algorithm;
 
 use DateTime;
 
-final class Thing
+final class Person
 {
     /** @var string */
     public $name;
@@ -32,5 +32,10 @@ final class Thing
     public function setBirthDate(DateTime $birthDate)
     {
         $this->birthDate = $birthDate;
+    }
+
+    public function isYounger(Person $person)
+    {
+        return $this->getBirthDate() < $person->getBirthDate();
     }
 }

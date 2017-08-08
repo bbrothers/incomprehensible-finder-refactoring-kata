@@ -6,60 +6,48 @@ namespace CodelyTV\FinderKata\Algorithm;
 
 final class Finder
 {
-    /** @var Thing[] */
-    private $_p;
+    /** @var Person[] */
+    private $people;
 
-    public function __construct(array $p)
+    public function __construct(array $people)
     {
-        $this->_p = $p;
+        $this->people = $people;
     }
 
-    public function find(int $ft): F
+    public function findPairWithClosestBirthdays() : PersonPair
     {
-        /** @var F[] $tr */
-        $tr = [];
 
-        for ($i = 0; $i < count($this->_p); $i++) {
-            for ($j = $i + 1; $j < count($this->_p); $j++) {
-                $r = new F();
+        $pairings = $this->getSortedPairs();
+        return array_pop($pairings);
+    }
 
-                if ($this->_p[$i]->birthDate < $this->_p[$j]->birthDate) {
-                    $r->p1 = $this->_p[$i];
-                    $r->p2 = $this->_p[$j];
-                } else {
-                    $r->p1 = $this->_p[$j];
-                    $r->p2 = $this->_p[$i];
-                }
+    public function findPairWithFarthestBirthdays() : PersonPair
+    {
 
-                $r->d = $r->p2->birthDate->getTimestamp()
-                    - $r->p1->birthDate->getTimestamp();
+        $pairings = $this->getSortedPairs();
+        return array_shift($pairings);
+    }
 
-                $tr[] = $r;
+    public function getSortedPairs() : array
+    {
+        /** @var PersonPair[] $pairings */
+        $pairings = [];
+
+        for ($i = 0; $i < count($this->people); $i++) {
+            $firstPerson = $this->people[$i];
+            for ($j = $i + 1; $j < count($this->people); $j++) {
+                $secondPerson = $this->people[$j];
+                $pairings[] = new PersonPair($firstPerson, $secondPerson);
             }
         }
 
-        if (count($tr) < 1) {
-            return new F();
+        if (count($pairings) < 1) {
+            return [new PersonPair];
         }
 
-        $answer = $tr[0];
-
-        foreach ($tr as $result) {
-            switch ($ft) {
-                case FT::ONE:
-                    if ($result->d < $answer->d) {
-                        $answer = $result;
-                    }
-                    break;
-
-                case FT::TWO:
-                    if ($result->d > $answer->d) {
-                        $answer = $result;
-                    }
-                    break;
-            }
-        }
-
-        return $answer;
+        usort($pairings, function (PersonPair $a, PersonPair $b) {
+            return $a->ageDifferenceInSeconds < $b->ageDifferenceInSeconds;
+        });
+        return $pairings;
     }
 }
